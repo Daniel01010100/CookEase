@@ -1,0 +1,159 @@
+//
+//  CuisineAPIRepository.swift
+//  CookEase
+//
+//  Created by YUDONG LU on 20/8/2025.
+//
+
+import Foundation
+
+protocol CuisineAPIRepositoryProtocol {
+    /*
+     @Brief
+        Obtain recipes recommendation based on dish name, cuisine category, and available equipment.
+     @Parameters
+        query: The name of the recipe user may search;
+        cuisine: The cuisine(s) of the recipe, use comma to sepearate;
+        equipment: The equipment required, use comma to seperate;
+        number: The amount of expected results (1 .. 100);
+    */
+    func fetchRecipes(_ query: String, _ cuisine: String, _ equipment: String, _ number: Int) async throws -> [Dish]
+    
+    /*
+     @Brief
+        Obtain the recipes recommendation based on available ingredients.
+     
+     @Parameters
+        ingredients: A comma-separated list of ingredients that the recipes contain;
+        number: The maximum amount of recipes to return (1...100);
+        ranking: Whether to maximise used ingredients (1) or minimise missing ingredients (2);
+        ignorePantry: Whether to ignore typical ingredient items, such as water, salt, etc.
+    */
+    func fetchRecipeByIngredients(_ ingredients: String, _ number: Int, _ ranking: Int, _ ignorePantry: Bool) async throws -> [Dish]
+    
+    /*
+     @Brief
+        Obtain full information about a recipe, such as ingredients, nutrition, etc.
+     @Parameters
+        recipeId: The id of the recipe;
+        includeNutrition: Whether to include nutrition data in the recipe information (per serving).
+    */
+    func fetchRecipeInformation(recipeID: Int, includeNutrition: Bool) async throws -> Dish
+    
+    /*
+     @Brief
+        Obtain a list of required equipment for a recipe.
+     @Parameters
+        recipeID: The id of the recipe. Return all the used equipment to complete this dish.
+    */
+    func fetchRequiredEquipment(recipeID: Int) async throws -> [EquipmentInfo]
+    
+    /*
+     @Brief
+        Obtain a list of ingredients for a recipe.
+     @Parameters
+        recipeID: The id of the recipe.
+    */
+    func fetchRequiredIngredient(recipeID: Int) async throws -> [Ingredient]
+    
+    /*
+     @Brief
+        Obtain an analysed breakdown of a recipe's instructions. Each step contains the ingredients and equipment required.
+     @Parameters
+        recipeID: The id of the recipe
+        stepBreakdown: Whether to break down the recipe steps even more. (Suitable for user who has basic cooking skill)
+    */
+    func fetchAnalysedRecipeInstructions(recipeID: Int, stepBreakdown: Bool) async throws -> Instruction
+    
+    /*
+     @Brief
+        Use an ingredient id to get available information about it.
+     @Parameters
+        ingredientID: The id of the ingredient;
+        amount: The amount of the ingredient;
+        unit: The unit for given amount;
+        locale: The returned data is in Britain English.
+    */
+    func fetchIngredientInfo(ingredientID: Int, amount: Int, unit: String, locale: String) async throws -> Ingredient
+}
+
+class CuisineAPIRepository: CuisineAPIRepositoryProtocol {
+    private let apiKey = "10e3c96611c646a0a0b9e03a8d4671f7"
+    private let urlSession = URLSession.shared
+    
+    func fetchRecipes(_ query: String, _ cuisine: String, _ equipment: String, _ number: Int) async throws -> [Dish] {
+        guard let url = SpoonacularEndpoint.searchRecipes(query: query, cuisine: cuisine, equipment: equipment,
+                                                          number: number).getURL(apiKey: apiKey)
+        else {
+            throw URLError(.badURL)
+        }
+        let (data, _) = try await urlSession.data(from: url)
+        let result = try JSONDecoder().decode([Dish].self, from: data)
+        return result
+    }
+    
+    func fetchRecipeByIngredients(_ ingredients: String, _ number: Int, _ ranking: Int, _ ignorePantry: Bool) async throws -> [Dish]
+    {
+        guard let url = SpoonacularEndpoint.searchRecipesByIngredients(ingredients: ingredients, number: number, ranking: ranking,
+                                                                       ignorePantry: ignorePantry).getURL(apiKey: apiKey)
+        else {
+            throw URLError(.badURL)
+        }
+        let (data, _) = try await urlSession.data(from: url)
+        let result = try JSONDecoder().decode([Dish].self, from: data)
+        return result;
+    }
+    
+    func fetchRecipeInformation(recipeID: Int, includeNutrition: Bool) async throws -> Dish {
+        guard let url = SpoonacularEndpoint.obtainRecipeInformation(id: recipeID,
+                                                                    includeNutrition: includeNutrition).getURL(apiKey: apiKey)
+        else {
+            throw URLError(.badURL)
+        }
+        let (data, _) = try await urlSession.data(from: url)
+        let result = try JSONDecoder().decode(Dish.self, from: data)
+        return result
+    }
+    
+    func fetchRequiredEquipment(recipeID: Int) async throws -> [EquipmentInfo] {
+        guard let url = SpoonacularEndpoint.obtainRequiredEquipment(id: recipeID).getURL(apiKey: apiKey)
+        else {
+            throw URLError(.badURL)
+        }
+        let (data, _) = try await urlSession.data(from: url)
+        let result = try JSONDecoder().decode([EquipmentInfo].self, from: data)
+        return result
+    }
+    
+    func fetchRequiredIngredient(recipeID: Int) async throws -> [Ingredient] {
+        guard let url = SpoonacularEndpoint.obtainRequiredIngredient(id: recipeID).getURL(apiKey: apiKey)
+        else {
+            throw URLError(.badURL)
+        }
+        let (data, _) = try await urlSession.data(from: url)
+        let result = try JSONDecoder().decode([Ingredient].self, from: data)
+        return result
+    }
+    
+    func fetchAnalysedRecipeInstructions(recipeID: Int, stepBreakdown: Bool) async throws -> Instruction {
+        guard let url = SpoonacularEndpoint.obtainAnalysedRecipeInstruction(id: recipeID,
+                                                                     stepBreakdown: stepBreakdown).getURL(apiKey: apiKey)
+        else {
+            throw URLError(.badURL)
+        }
+        let (data, _) = try await urlSession.data(from: url)
+        let result = try JSONDecoder().decode(Instruction.self, from: data)
+        return result
+    }
+    
+    func fetchIngredientInfo(ingredientID: Int, amount: Int, unit: String, locale: String) async throws -> Ingredient {
+        guard let url = SpoonacularEndpoint.obtainIngredientInformation(id: ingredientID, amount: amount, unit: unit,
+                                                                        locale: locale).getURL(apiKey: apiKey)
+        else {
+            throw URLError(.badURL)
+        }
+        let (data, _) = try await urlSession.data(from: url)
+        let result = try JSONDecoder().decode(Ingredient.self, from: data)
+        return result
+    }
+}
