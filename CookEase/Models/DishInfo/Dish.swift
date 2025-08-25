@@ -8,8 +8,9 @@
 import Foundation
 
 struct Dish: Codable, Identifiable {
+    var id: UUID = UUID()   // Localised dish id.
     /* fetchRecipeInformation */
-    var id: Int     // Refer to "id" in the json file.
+    var apiID: Int     // Refer to "id" in the json file.
     var title: String       // Refer to "title" in the json file.
     var imageName: String   // Refer to "image" in the json file.
     var servings: Int       // Refer to "servings" in the json file.

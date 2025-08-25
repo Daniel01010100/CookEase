@@ -8,7 +8,9 @@
 import Foundation
 
 struct EquipmentInfo: Decodable {
-    var id: Int      // Refer to "id" in the json file.
+    var id: UUID = UUID()   // Localised equipment id.
+    /* fetchRequiredEquipment || fetchAnalysedRecipeInstructions */
+    var apiID: Int      // Refer to "id" in the json file.
     var imageName: String   // Refer to "image" in the json file.
     var name: Equipment     // Refer to "name" in the json file.
     var status: String      // Refer to the data such as "temperature".

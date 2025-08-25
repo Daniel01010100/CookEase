@@ -14,17 +14,21 @@ enum StorageLocation: String, Codable {
 }
 
 struct Quantity: Codable {
-    var amount: Double = 0.0
-    var unit: String
+    var amount: Double = 0.0    // Refer to "amount" in the json file.
+    var unit: String    // Refer to the "unit" in the json file.
 }
 
 struct Ingredient: Codable, Identifiable {
-    var id: Int
-    var name: String
-    var imageName: String
-    var purchasedAt: Date? = nil
-    var category: IngredientCategory
+    var id: UUID = UUID()   // Localised ingredient id.
+    /* fetchIngredientInformation */
+    var apiID: Int     // Refer to "id" in the json file.
+    var name: String    //Refer to "name" in the json file.
+    var imageName: String   // Refer to "image" in the json file.
+    var category: IngredientCategory    // Refer to "categoryPath" in the json file.
     var quantity: Quantity? = nil
+    var nutrition: Nutrition? = nil     // Refer to "nutrients" in the json file.
+    /* Will be estimated by the app */
     var storageLocation: StorageLocation? = nil
-    var nutrition: Nutrition? = nil
+    /* Will be input by the user */
+    var purchasedAt: Date? = nil
 }

@@ -13,11 +13,15 @@ protocol CuisineAPIRepositoryProtocol {
         Obtain recipes recommendation based on dish name, cuisine category, and available equipment.
      @Parameters
         query: The name of the recipe user may search;
-        cuisine: The cuisine(s) of the recipe, use comma to sepearate;
-        equipment: The equipment required, use comma to seperate;
+        cuisine: The cuisine(s) of the recipe, comma-seperated as OR;
+        excludeCuisine: The cuisine(s) the cipes must not match, comma-seperated as AND;
+        diet: The diet(s) for which the recipes must be suitable, comma-seperated as OR, pipe-seperated as AND;
+        intolerances: The list of intolerances that recipes must not contains, comma-seperated as AND;
+        equipment: The equipment required, comma-seperated as OR;
         number: The amount of expected results (1 .. 100);
     */
-    func fetchRecipes(_ query: String, _ cuisine: String, _ equipment: String, _ number: Int) async throws -> [Dish]
+    func fetchRecipes(_ query: String, _ cuisine: String, _ excludeCuisine: String, _ diet: String, _ intolerances: String,
+                      _ equipment: String, _ number: Int) async throws -> [Dish]
     
     /*
      @Brief
@@ -81,8 +85,11 @@ class CuisineAPIRepository: CuisineAPIRepositoryProtocol {
     private let apiKey = "10e3c96611c646a0a0b9e03a8d4671f7"
     private let urlSession = URLSession.shared
     
-    func fetchRecipes(_ query: String, _ cuisine: String, _ equipment: String, _ number: Int) async throws -> [Dish] {
-        guard let url = SpoonacularEndpoint.searchRecipes(query: query, cuisine: cuisine, equipment: equipment,
+    func fetchRecipes(_ query: String, _ cuisine: String, _ excludeCuisine: String, _ diet: String, _ intolerances: String,
+                      _ equipment: String, _ number: Int) async throws -> [Dish] {
+        guard let url = SpoonacularEndpoint.searchRecipes(query: query, cuisine: cuisine,
+                                                          excludeCuisine: excludeCuisine, diet: diet,
+                                                          intolerances: intolerances, equipment: equipment,
                                                           number: number).getURL(apiKey: apiKey)
         else {
             throw URLError(.badURL)

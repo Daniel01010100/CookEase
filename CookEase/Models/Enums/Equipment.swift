@@ -42,4 +42,8 @@ enum Equipment: String, Codable {
     case standMixer = "stand mixer"
     case foodProcessor = "food processor"
     case blender = "blender"
+    /* Measurement */
+    case measuringCup = "measuring cup"
+    case measuringSpoon = "measuring spoon"
+    case kitchenThermometer = "kitchen thermometer"
 }
