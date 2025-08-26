@@ -18,7 +18,7 @@ protocol CuisineAPIRepositoryProtocol {
         diet: The diet(s) for which the recipes must be suitable, comma-seperated as OR, pipe-seperated as AND;
         intolerances: The list of intolerances that recipes must not contains, comma-seperated as AND;
         equipment: The equipment required, comma-seperated as OR;
-        number: The amount of expected results (1 .. 100);
+        number: The amount of expected results (1 .. 100).
     */
     func fetchRecipes(_ query: String, _ cuisine: String, _ excludeCuisine: String, _ diet: String, _ intolerances: String,
                       _ equipment: String, _ number: Int) async throws -> [Dish]
@@ -64,7 +64,7 @@ protocol CuisineAPIRepositoryProtocol {
      @Brief
         Obtain an analysed breakdown of a recipe's instructions. Each step contains the ingredients and equipment required.
      @Parameters
-        recipeID: The id of the recipe
+        recipeID: The id of the recipe;
         stepBreakdown: Whether to break down the recipe steps even more. (Suitable for user who has basic cooking skill)
     */
     func fetchAnalysedRecipeInstructions(recipeID: Int, stepBreakdown: Bool) async throws -> Instruction

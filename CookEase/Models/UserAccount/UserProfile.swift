@@ -25,7 +25,7 @@ struct DishPreference: Codable {
 }
 
 struct UserProfile: Codable, Identifiable {
-    var id: UUID = UUID()   // User's id.
+    var id: UUID  // User's id.
     var nickname: String    // User's nickname.
     var email: String       // User's email which is binded with password.
     var isLogin: Bool = false   // User's login status. true - is logged in; false - is logged out.
@@ -36,4 +36,10 @@ struct UserProfile: Codable, Identifiable {
     var existingIngredients: [Ingredient]?  // An array that stores the ingredients the user has (optional).
     var cuisinePreference: [Cuisine: PreferenceType] = [:]  // An dictionary that stores the user's cuisine preferences.
     var dishPreference: [UUID: DishPreference] = [:]    // An dictionary that stores the user's dish preferences.
+    
+    init() {
+        self.id = UUID()
+        self.nickname = ""
+        self.email = ""
+    }
 }

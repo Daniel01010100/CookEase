@@ -9,8 +9,15 @@ import Foundation
 
 @Observable
 class UserViewModel {
-    var userProfile: UserProfile
+    var userProfile: UserProfile = UserProfile()    // The default value of userProfile will be overwritten in the sign-up function.
     
+    /*
+     @Brief
+        Provides registration functionality, saves the user's email account to userProfile, and uses the Security library to bundle the password and email address and store them together in kSecValueData.
+     @Parameters
+        email: Account registration email.
+        password: The password which is bundled with user's email address.
+     */
     func signUp(_ email: String, _ password: String) throws {
         if (email.isEmpty || password.isEmpty) {
             throw CookEaseError.emptyEmailOrPassword
@@ -118,16 +125,58 @@ class UserViewModel {
         self.userProfile.ownedEquipment = tools
     }
     
-    func addExistingIngredients(_ name: String, _ amount: Double, _ unit: String, _ purchasedAt: Date? = nil) {
-
+    func insertIngredients(_ ingredientID: UUID, _ name: String, _ amount: Double, _ unit: String,
+                                _ purchasedAt: Date? = nil) throws {
+        let newIngredient = Ingredient(
+            id: ingredientID,
+            name: name,
+            quantity: Quantity(amount: amount, unit: unit),
+            purchasedAt: purchasedAt
+        )
+        
+        if var ingredients = self.userProfile.existingIngredients {
+            guard !ingredients.contains(where: { $0.id == ingredientID }) else {
+                throw CookEaseError.duplicateItem(errorInfo: "ingredient")
+            }
+            ingredients.append(newIngredient)
+            self.userProfile.existingIngredients = ingredients
+        } else {
+            self.userProfile.existingIngredients = [newIngredient]
+        }
     }
     
-    func modifyIngredients(_ amount: Double, _ unit: String, _ purchasedAt: Date? = nil) {
-        
+    func updateIngredientsByID(_ ingredientID: UUID, _ name: String, _ amount: Double, _ unit: String,
+                               _ purchasedAt: Date? = nil) throws {
+        guard var ingredients = self.userProfile.existingIngredients else {
+            throw CookEaseError.emptyDataSource(errorInfo: "ingredients")
+        }
+        if let idx = ingredients.firstIndex(where: { $0.id == ingredientID }) {
+            if (ingredients[idx].name != name ||
+               ingredients[idx].quantity?.amount != amount ||
+               ingredients[idx].quantity?.unit != unit ||
+               ingredients[idx].purchasedAt != purchasedAt) {
+                
+                ingredients[idx].name = name
+                ingredients[idx].quantity = Quantity(amount: amount, unit: unit)
+                ingredients[idx].purchasedAt = purchasedAt
+                self.userProfile.existingIngredients = ingredients
+            }
+        } else {
+            throw CookEaseError.itemNotFound(errorInfo: "ingredient")
+        }
     }
     
-    func deleteExistingIngredients(_ name: String) throws {
+    func deleteIngredients(_ ingredientID: UUID) throws {
+        guard var ingredients = self.userProfile.existingIngredients else {
+            throw CookEaseError.emptyDataSource(errorInfo: "ingredients")
+        }
         
+        guard ingredients.contains(where: { $0.id == ingredientID}) else {
+            throw CookEaseError.itemNotFound(errorInfo: "ingredient")
+        }
+        
+        ingredients.removeAll { $0.id == ingredientID }
+        self.userProfile.existingIngredients = ingredients
     }
     
     func updateCuisinePreference(_ cuisine: Cuisine, preferenceType: PreferenceType) {
@@ -147,9 +196,6 @@ class UserViewModel {
         
         self.userProfile.dishPreference[dishID] = currentPreference
     }
-    
-    
-    
 }
 
 extension String {

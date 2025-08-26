@@ -16,6 +16,7 @@ enum CookEaseError: Error {
     case invalidCredentials
     case emptyDataSource(errorInfo: String)    // Target data is empty
     case itemNotFound(errorInfo: String)   // Failed to find the selected diet.
+    case duplicateItem(errorInfo: String)   // Add the same item repeatedly.
 
     
     var errorDescription: String {
@@ -36,6 +37,8 @@ enum CookEaseError: Error {
             return "Required data \(errorInfo) is currently unavailable or empty"
         case .itemNotFound(let errorInfo):
             return "Failed to find the selected item: \(errorInfo)"
+        case .duplicateItem(let errorInfo):
+            return "Should not add same item repeatedly: \(errorInfo)"
         }
     }
 }

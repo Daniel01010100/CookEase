@@ -21,10 +21,10 @@ struct Quantity: Codable {
 struct Ingredient: Codable, Identifiable {
     var id: UUID = UUID()   // Localised ingredient id.
     /* fetchIngredientInformation */
-    var apiID: Int     // Refer to "id" in the json file.
+    var apiID: Int? = nil     // Refer to "id" in the json file.
     var name: String    //Refer to "name" in the json file.
-    var imageName: String   // Refer to "image" in the json file.
-    var category: IngredientCategory    // Refer to "categoryPath" in the json file.
+    var imageName: String? = nil   // Refer to "image" in the json file.
+    var category: IngredientCategory? = nil    // Refer to "categoryPath" in the json file.
     var quantity: Quantity? = nil
     var nutrition: Nutrition? = nil     // Refer to "nutrients" in the json file.
     /* Will be estimated by the app */

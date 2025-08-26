@@ -8,16 +8,17 @@
 import Foundation
 
 enum IngredientCategory: String, Codable {
-    case vegetable
-    case fruit
-    case meat
-    case egg
-    case dairy
-    case seasoning
-    case seafood
-    case grain
-    case legume     // Beans
-    case nut
-    case mushroom
-    case oil
+    case vegetable = "vegetable"
+    case fruit = "fruit"
+    case meat = "meat"
+    case egg = "egg"
+    case dairy = "dairy"
+    case seasoning = "seasoning"
+    case seafood = "seafood"
+    case grain = "grain"
+    case legume = "legume"     // Beans
+    case nut = "nut"
+    case mushroom = "mushroom"
+    case oil = "oil"
+    case other
 }
