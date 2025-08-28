@@ -13,36 +13,34 @@ class UserViewModel {
     
     /*
      @Brief
-        Provides registration functionality, saves the user's email account to userProfile, and uses the Security library to bundle the password and email address and store them together in kSecValueData.
+        Provides registration functionality, saves the user's email account to userProfile.
      @Parameters
         email: Account registration email.
         password: The password which is bundled with user's email address.
      */
-    func signUp(_ email: String, _ password: String) throws {
+    func signUp(_ email: String, _ password: String) -> Bool {
         if (email.isEmpty || password.isEmpty) {
-            throw CookEaseError.emptyEmailOrPassword
+            return false
         }
         if (!email.isValidEmail) {
-            throw CookEaseError.invalidEmailFormat
+            return false
         }
         
         self.userProfile.email = email
-        try AccountSecurity.savePassword(password, for: email)
+        self.userProfile.password = password
+        return true
     }
     
-    func signIn(_ email: String, _ password: String) throws {
+    func signIn(_ email: String, _ password: String) -> Bool {
         if (email.isEmpty || password.isEmpty) {
-            throw CookEaseError.emptyEmailOrPassword
+            return false
         }
-        if (!email.isValidEmail) {
-            throw CookEaseError.invalidEmailFormat
-        }
-        
-        let savedPassword = try AccountSecurity.retrievePassword(for: email)
-        if (password == savedPassword) {
+       
+        if (email == self.userProfile.email && password == self.userProfile.password) {
             self.userProfile.isLogin = true
+            return true
         } else {
-            throw CookEaseError.invalidCredentials
+            return false
         }
     }
     
@@ -50,13 +48,16 @@ class UserViewModel {
         self.userProfile.isLogin = false
     }
     
-    
     func setNickName(_ nickName: String) {
         self.userProfile.nickname = nickName
     }
     
     func setCookingSkill(_ skill: CookingSkill) {
         self.userProfile.cookingSkill = skill
+    }
+    
+    func getUserCookingSkill() -> CookingSkill {
+        return self.userProfile.cookingSkill ?? .Basic
     }
     
     func addDietaryPreference(_ diet: Diet) {
@@ -81,6 +82,10 @@ class UserViewModel {
         self.userProfile.diets = dietsList
     }
     
+    func getUserDietaryPreferences() -> [Diet] {
+        return self.userProfile.diets ?? [.standard]
+    }
+    
     func addIntolerance(_ intolerance: Intolerance) {
         guard var intoList = self.userProfile.intolerances else {
             self.userProfile.intolerances = [intolerance]
@@ -103,6 +108,10 @@ class UserViewModel {
         self.userProfile.intolerances = intoList
     }
     
+    func getUserIntolerances() -> [Intolerance] {
+        return self.userProfile.intolerances ?? [.none]
+    }
+    
     func addOwnedquipment(_ equipment: Equipment) {
         guard var tools = self.userProfile.ownedEquipment else {
             self.userProfile.ownedEquipment = [equipment]
@@ -123,6 +132,10 @@ class UserViewModel {
         }
         tools.removeAll { $0 == equipment }
         self.userProfile.ownedEquipment = tools
+    }
+    
+    func getUserOwnedEquipment() -> [Equipment] {
+        return self.userProfile.ownedEquipment ?? [.standard]
     }
     
     func insertIngredients(_ ingredientID: UUID, _ name: String, _ amount: Double, _ unit: String,
@@ -179,8 +192,16 @@ class UserViewModel {
         self.userProfile.existingIngredients = ingredients
     }
     
+    func getUserExistingIngredients() throws -> [Ingredient] {
+        return self.userProfile.existingIngredients ?? []
+    }
+    
     func updateCuisinePreference(_ cuisine: Cuisine, preferenceType: PreferenceType) {
         self.userProfile.cuisinePreference[cuisine] = preferenceType
+    }
+    
+    func getUserCuisinePreference() -> [Cuisine: PreferenceType] {
+        return self.userProfile.cuisinePreference
     }
     
     func updateDishPreference(_ dishID: UUID, preferenceType: PreferenceType? = nil, isCookedBefore: Bool? = nil) {
@@ -195,6 +216,41 @@ class UserViewModel {
         }
         
         self.userProfile.dishPreference[dishID] = currentPreference
+    }
+    
+    func getUserDishPreference() -> [UUID: DishPreference] {
+        return self.userProfile.dishPreference
+    }
+    
+    func saveUserProfile() throws {
+        let jsonEncoder = JSONEncoder()
+        guard let userData = try? jsonEncoder.encode(self.userProfile) else {
+            throw CookEaseError.jsonCodingFailed(errorInfo: "userProfile")
+        }
+        
+        guard let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("userProfile.json") else {
+            throw CookEaseError.invalidURL(errorInfo: "userProfile.json")
+        }
+        
+        do {
+            try userData.write(to: fileURL)
+        } catch {
+            throw CookEaseError.saveDataFailed(errorInfo: "userProfile.json")
+        }
+    }
+    
+    func loadUserProfile() throws {
+        let jsonDecoder = JSONDecoder()
+        guard let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("userProfile.json") else {
+            throw CookEaseError.invalidURL(errorInfo: "userProfile.json")
+        }
+        
+        do {
+            let userData = try Data(contentsOf: fileURL)
+            self.userProfile = try jsonDecoder.decode(UserProfile.self, from: userData)
+        } catch {
+            throw CookEaseError.jsonDecodingFailed(errorInfo: "userProfile")
+        }
     }
 }
 

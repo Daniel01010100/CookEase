@@ -33,7 +33,7 @@ protocol CuisineAPIRepositoryProtocol {
         ranking: Whether to maximise used ingredients (1) or minimise missing ingredients (2);
         ignorePantry: Whether to ignore typical ingredient items, such as water, salt, etc.
     */
-    func fetchRecipeByIngredients(_ ingredients: String, _ number: Int, _ ranking: Int, _ ignorePantry: Bool) async throws -> [Dish]
+    func fetchRecipesByIngredients(_ ingredients: String, _ number: Int, _ ranking: Int, _ ignorePantry: Bool) async throws -> [Dish]
     
     /*
      @Brief
@@ -42,7 +42,7 @@ protocol CuisineAPIRepositoryProtocol {
         recipeId: The id of the recipe;
         includeNutrition: Whether to include nutrition data in the recipe information (per serving).
     */
-    func fetchRecipeInformation(recipeID: Int, includeNutrition: Bool) async throws -> Dish
+    func fetchRecipeInformation(_ recipeID: Int, _ includeNutrition: Bool) async throws -> Dish
     
     /*
      @Brief
@@ -50,7 +50,7 @@ protocol CuisineAPIRepositoryProtocol {
      @Parameters
         recipeID: The id of the recipe. Return all the used equipment to complete this dish.
     */
-    func fetchRequiredEquipment(recipeID: Int) async throws -> [EquipmentInfo]
+    func fetchRequiredEquipment(_ recipeID: Int) async throws -> [EquipmentInfo]
     
     /*
      @Brief
@@ -58,7 +58,7 @@ protocol CuisineAPIRepositoryProtocol {
      @Parameters
         recipeID: The id of the recipe.
     */
-    func fetchRequiredIngredient(recipeID: Int) async throws -> [Ingredient]
+    func fetchRequiredIngredient(_ recipeID: Int) async throws -> [Ingredient]
     
     /*
      @Brief
@@ -67,7 +67,7 @@ protocol CuisineAPIRepositoryProtocol {
         recipeID: The id of the recipe;
         stepBreakdown: Whether to break down the recipe steps even more. (Suitable for user who has basic cooking skill)
     */
-    func fetchAnalysedRecipeInstructions(recipeID: Int, stepBreakdown: Bool) async throws -> Instruction
+    func fetchAnalysedRecipeInstructions(_ recipeID: Int, _ stepBreakdown: Bool) async throws -> Instruction
     
     /*
      @Brief
@@ -78,7 +78,7 @@ protocol CuisineAPIRepositoryProtocol {
         unit: The unit for given amount;
         locale: The returned data is in Britain English.
     */
-    func fetchIngredientInfo(ingredientID: Int, amount: Int, unit: String, locale: String) async throws -> Ingredient
+    func fetchIngredientInfo(_ ingredientID: Int, _ amount: Int, _ unit: String, _ locale: String) async throws -> Ingredient
 }
 
 class CuisineAPIRepository: CuisineAPIRepositoryProtocol {
@@ -99,7 +99,7 @@ class CuisineAPIRepository: CuisineAPIRepositoryProtocol {
         return result
     }
     
-    func fetchRecipeByIngredients(_ ingredients: String, _ number: Int, _ ranking: Int, _ ignorePantry: Bool) async throws -> [Dish]
+    func fetchRecipesByIngredients(_ ingredients: String, _ number: Int, _ ranking: Int, _ ignorePantry: Bool) async throws -> [Dish]
     {
         guard let url = SpoonacularEndpoint.searchRecipesByIngredients(ingredients: ingredients, number: number, ranking: ranking,
                                                                        ignorePantry: ignorePantry).getURL(apiKey: apiKey)
@@ -111,7 +111,7 @@ class CuisineAPIRepository: CuisineAPIRepositoryProtocol {
         return result;
     }
     
-    func fetchRecipeInformation(recipeID: Int, includeNutrition: Bool) async throws -> Dish {
+    func fetchRecipeInformation(_ recipeID: Int, _ includeNutrition: Bool) async throws -> Dish {
         guard let url = SpoonacularEndpoint.obtainRecipeInformation(id: recipeID,
                                                                     includeNutrition: includeNutrition).getURL(apiKey: apiKey)
         else {
@@ -122,7 +122,7 @@ class CuisineAPIRepository: CuisineAPIRepositoryProtocol {
         return result
     }
     
-    func fetchRequiredEquipment(recipeID: Int) async throws -> [EquipmentInfo] {
+    func fetchRequiredEquipment(_ recipeID: Int) async throws -> [EquipmentInfo] {
         guard let url = SpoonacularEndpoint.obtainRequiredEquipment(id: recipeID).getURL(apiKey: apiKey)
         else {
             throw URLError(.badURL)
@@ -132,7 +132,7 @@ class CuisineAPIRepository: CuisineAPIRepositoryProtocol {
         return result
     }
     
-    func fetchRequiredIngredient(recipeID: Int) async throws -> [Ingredient] {
+    func fetchRequiredIngredient(_ recipeID: Int) async throws -> [Ingredient] {
         guard let url = SpoonacularEndpoint.obtainRequiredIngredient(id: recipeID).getURL(apiKey: apiKey)
         else {
             throw URLError(.badURL)
@@ -142,7 +142,7 @@ class CuisineAPIRepository: CuisineAPIRepositoryProtocol {
         return result
     }
     
-    func fetchAnalysedRecipeInstructions(recipeID: Int, stepBreakdown: Bool) async throws -> Instruction {
+    func fetchAnalysedRecipeInstructions(_ recipeID: Int, _ stepBreakdown: Bool) async throws -> Instruction {
         guard let url = SpoonacularEndpoint.obtainAnalysedRecipeInstruction(id: recipeID,
                                                                      stepBreakdown: stepBreakdown).getURL(apiKey: apiKey)
         else {
@@ -153,7 +153,7 @@ class CuisineAPIRepository: CuisineAPIRepositoryProtocol {
         return result
     }
     
-    func fetchIngredientInfo(ingredientID: Int, amount: Int, unit: String, locale: String) async throws -> Ingredient {
+    func fetchIngredientInfo(_ ingredientID: Int, _ amount: Int, _ unit: String, _ locale: String) async throws -> Ingredient {
         guard let url = SpoonacularEndpoint.obtainIngredientInformation(id: ingredientID, amount: amount, unit: unit,
                                                                         locale: locale).getURL(apiKey: apiKey)
         else {

@@ -8,6 +8,7 @@
 import Foundation
 
 enum Intolerance: String, Codable {
+    case none
     case dairy = "dairy"
     case egg = "egg"
     case gluten = "gluten"

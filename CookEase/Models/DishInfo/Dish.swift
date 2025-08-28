@@ -8,19 +8,24 @@
 import Foundation
 
 struct Dish: Codable, Identifiable {
-    var id: UUID = UUID()   // Localised dish id.
+    var dishID: UUID = UUID()   // Localised dish id.
+    /* fetchRecipeInformation() || fetchRecipes() || fetchRecipesByIngredients() */
+    var id: Int = 0     // Refer to "id" in the json file.
+    var title: String? = nil       // Refer to "title" in the json file.
+    var image: String? = nil   // Refer to "image" in the json file.
     /* fetchRecipeInformation */
-    var apiID: Int     // Refer to "id" in the json file.
-    var title: String       // Refer to "title" in the json file.
-    var imageName: String   // Refer to "image" in the json file.
-    var servings: Int       // Refer to "servings" in the json file.
-    var cookingTime: Int   // Refer to "readyInMinutes" in the json file (unit: minutes).
-    var category: Cuisine   // Refer to "cuisines" in the json file.
-    var estimatedNutrition: Nutrition? = nil    // Refer to "nutrients" in the json file.
-    /* fetchRequiredIngredient */
-    var ingredients: [Ingredient]   // Refer to "ingredients" in the json file.
-    /* fetchRequiredEquipment */
-    var requiredTools: [Equipment]  // Refer to "equipment" in the json file.
+    var servings: Int? = nil       // Refer to "servings" in the json file.
+    var readyInMinutes: Int? = nil   // Refer to "readyInMinutes" in the json file (unit: minutes).
+    var cuisines: Cuisine? = nil   // Refer to "cuisines" in the json file.
+    /* fetchRequiredEquipment() */
+    var equipment: [Equipment]? = nil  // Refer to "equipment" in the json file.
+    /* fetchRequiredIngredient() */
+    var ingredients: [Ingredient]? = nil   // Refer to "ingredients" in the json file.
     /* Fulfilled by the self-created algorithm */
-    var level: CookingSkill // It's not referenced from the json file.
+    var level: CookingSkill? = nil // It's not referenced from the json file.
+}
+
+struct DishResult: Codable {
+    /* fetchRcipes() */
+    let results: [Dish]     // The search results returned by the API.
 }
