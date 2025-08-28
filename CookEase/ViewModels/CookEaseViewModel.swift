@@ -94,3 +94,9 @@ class CookEaseViewModel {
     
 }
 
+extension CookEaseViewModel {
+    var isUserLoggedIn: Bool {
+        return self.userVM.userProfile.isLogin
+    }
+}
+

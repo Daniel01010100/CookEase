@@ -141,14 +141,15 @@ class UserViewModel {
     func insertIngredients(_ ingredientID: UUID, _ name: String, _ amount: Double, _ unit: String,
                                 _ purchasedAt: Date? = nil) throws {
         let newIngredient = Ingredient(
-            id: ingredientID,
+            ingredientID: ingredientID,
             name: name,
-            quantity: Quantity(amount: amount, unit: unit),
+            amount: amount,
+            unit: unit,
             purchasedAt: purchasedAt
         )
         
         if var ingredients = self.userProfile.existingIngredients {
-            guard !ingredients.contains(where: { $0.id == ingredientID }) else {
+            guard !ingredients.contains(where: { $0.ingredientID == ingredientID }) else {
                 throw CookEaseError.duplicateItem(errorInfo: "ingredient")
             }
             ingredients.append(newIngredient)
@@ -163,14 +164,15 @@ class UserViewModel {
         guard var ingredients = self.userProfile.existingIngredients else {
             throw CookEaseError.emptyDataSource(errorInfo: "ingredients")
         }
-        if let idx = ingredients.firstIndex(where: { $0.id == ingredientID }) {
+        if let idx = ingredients.firstIndex(where: { $0.ingredientID == ingredientID }) {
             if (ingredients[idx].name != name ||
-               ingredients[idx].quantity?.amount != amount ||
-               ingredients[idx].quantity?.unit != unit ||
+               ingredients[idx].amount != amount ||
+               ingredients[idx].unit != unit ||
                ingredients[idx].purchasedAt != purchasedAt) {
                 
                 ingredients[idx].name = name
-                ingredients[idx].quantity = Quantity(amount: amount, unit: unit)
+                ingredients[idx].amount = amount
+                ingredients[idx].unit = unit
                 ingredients[idx].purchasedAt = purchasedAt
                 self.userProfile.existingIngredients = ingredients
             }
@@ -184,11 +186,11 @@ class UserViewModel {
             throw CookEaseError.emptyDataSource(errorInfo: "ingredients")
         }
         
-        guard ingredients.contains(where: { $0.id == ingredientID}) else {
+        guard ingredients.contains(where: { $0.ingredientID == ingredientID}) else {
             throw CookEaseError.itemNotFound(errorInfo: "ingredient")
         }
         
-        ingredients.removeAll { $0.id == ingredientID }
+        ingredients.removeAll { $0.ingredientID == ingredientID }
         self.userProfile.existingIngredients = ingredients
     }
     

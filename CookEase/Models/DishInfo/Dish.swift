@@ -20,7 +20,7 @@ struct Dish: Codable, Identifiable {
     /* fetchRequiredEquipment() */
     var equipment: [Equipment]? = nil  // Refer to "equipment" in the json file.
     /* fetchRequiredIngredient() */
-    var ingredients: [Ingredient]? = nil   // Refer to "ingredients" in the json file.
+    var ingredients: [RequiredIngredients]? = nil   // Refer to "ingredients" in the json file.
     /* Fulfilled by the self-created algorithm */
     var level: CookingSkill? = nil // It's not referenced from the json file.
 }

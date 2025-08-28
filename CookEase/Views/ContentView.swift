@@ -8,14 +8,15 @@
 import SwiftUI
 
 struct ContentView: View {
+    var cevm: CookEaseViewModel
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        if (cevm.isUserLoggedIn) {
+            TabView {
+                
+            }
+        } else {
+            WelcomeView()
         }
-        .padding()
     }
 }
 
