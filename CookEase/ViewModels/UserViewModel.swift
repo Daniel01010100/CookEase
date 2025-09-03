@@ -18,8 +18,8 @@ class UserViewModel {
         email: Account registration email.
         password: The password which is bundled with user's email address.
      */
-    func signUp(_ email: String, _ password: String) -> Bool {
-        if (email.isEmpty || password.isEmpty) {
+    func signUp(_ email: String, _ password: String, _ securityQuestion: String, _ securityAnswer: String) -> Bool {
+        if (email.isEmpty || password.isEmpty || securityQuestion.isEmpty || securityAnswer.isEmpty) {
             return false
         }
         if (!email.isValidEmail) {
@@ -28,6 +28,8 @@ class UserViewModel {
         
         self.userProfile.email = email
         self.userProfile.password = password
+        self.userProfile.securityQuestion = securityQuestion
+        self.userProfile.securityAnswer = securityAnswer
         return true
     }
     
@@ -37,7 +39,6 @@ class UserViewModel {
         }
        
         if (email == self.userProfile.email && password == self.userProfile.password) {
-            self.userProfile.isLogin = true
             return true
         } else {
             return false
@@ -46,6 +47,25 @@ class UserViewModel {
     
     func signOut() {
         self.userProfile.isLogin = false
+    }
+    
+    func authenticateSecurityQuestion(_ email: String, _ answer: String) -> Bool {
+        if (email.isEmpty || answer.isEmpty) {
+            return false
+        }
+        if (email != self.userProfile.email || answer != self.userProfile.securityAnswer) {
+            return false
+        }
+        
+        return true
+    }
+    
+    func getUserSecurityQuestion() -> String {
+        return self.userProfile.securityQuestion
+    }
+    
+    func resetPassword(_ newPassword: String) {
+        self.userProfile.password = newPassword
     }
     
     func setNickName(_ nickName: String) {
@@ -194,7 +214,7 @@ class UserViewModel {
         self.userProfile.existingIngredients = ingredients
     }
     
-    func getUserExistingIngredients() throws -> [Ingredient] {
+    func getUserExistingIngredients() -> [Ingredient] {
         return self.userProfile.existingIngredients ?? []
     }
     
@@ -258,7 +278,7 @@ class UserViewModel {
 
 extension String {
     var isValidEmail: Bool {
-        let emailRegex = #"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
+        let emailRegex = #"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z0-9.-]+$"#
         return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: self)
     }
 }

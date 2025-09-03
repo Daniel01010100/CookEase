@@ -6,11 +6,15 @@
 //
 
 import Observation
+import SwiftUI
 
 @Observable
 class CookEaseViewModel {
     var userVM: UserViewModel
     var cuisineAPI: CuisineAPIRepository = CuisineAPIRepository()
+    var navPath: [AuthRoute] = []
+    
+    let cookEaseThemeColour = Color(red: 1.0, green: 0.4, blue: 0.0)
     
     func generateRecipesBasedOnIngredients(_ ingredients: [Ingredient], _ number: Int) async throws -> [Dish] {
         var ingredientsInfo = ""
@@ -97,6 +101,10 @@ class CookEaseViewModel {
 extension CookEaseViewModel {
     var isUserLoggedIn: Bool {
         return self.userVM.userProfile.isLogin
+    }
+    
+    func setUserLoggenInStatus(_ status: Bool) {
+        self.userVM.userProfile.isLogin = status
     }
 }
 

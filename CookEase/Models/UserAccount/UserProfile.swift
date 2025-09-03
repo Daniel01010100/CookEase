@@ -28,6 +28,8 @@ struct UserProfile: Codable, Identifiable {
     var id: UUID  // User's id.
     var nickname: String    // User's nickname.
     var email: String       // User's email which is binded with password.
+    var securityQuestion: String
+    var securityAnswer: String
     var password: String
     var isLogin: Bool = false   // User's login status. true - is logged in; false - is logged out.
     var cookingSkill: CookingSkill?
@@ -43,5 +45,7 @@ struct UserProfile: Codable, Identifiable {
         self.nickname = ""
         self.email = ""
         self.password = ""
+        self.securityQuestion = ""
+        self.securityAnswer = ""
     }
 }

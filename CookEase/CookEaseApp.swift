@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct CookEaseApp: App {
+    var cevm: CookEaseViewModel = CookEaseViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(cevm: cevm)
         }
     }
 }
