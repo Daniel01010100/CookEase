@@ -17,6 +17,7 @@ enum CookEaseError: Error {
     case loadDataFailed(errorInfo: String)
     case jsonCodingFailed(errorInfo: String)    // Failed to encode data.
     case jsonDecodingFailed(errorInfo: String)  // Failed to decode data.
+    case invalidJSON(errorInfo: String)     // The returned data is not a valid json file
 
     
     var errorDescription: String {
@@ -41,6 +42,9 @@ enum CookEaseError: Error {
             return "Failed to encode data: \(errorInfo)"
         case .jsonDecodingFailed(let errorInfo):
             return "Failed to decode data: \(errorInfo)"
+            
+        case .invalidJSON(let errorInfo):
+            return "Returned data is not valid JSON: \(errorInfo)"
         }
     }
 }

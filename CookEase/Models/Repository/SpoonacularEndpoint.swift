@@ -8,7 +8,7 @@
 import Foundation
 
 enum SpoonacularEndpoint {
-    case searchRecipes(query: String, cuisine: String, excludeCuisine: String, diet: String, intolerances: String,
+    case searchRecipes(query: String, diet: String, intolerances: String,
                        equipment: String, number: Int = 1)  // Identical
     
     case searchRecipesByIngredients(ingredients: String, number: Int = 1, ranking: Int = 2, ignorePantry: Bool = true)  // Identical
@@ -46,11 +46,9 @@ enum SpoonacularEndpoint {
     
     var queryItems: [URLQueryItem] {
         switch self {
-        case .searchRecipes(let query, let cuisine, let excludeCuisine, let diet, let intolerances, let equipment, let number):
+        case .searchRecipes(let query, let diet, let intolerances, let equipment, let number):
             return [
                 URLQueryItem(name: "query", value: query),
-                URLQueryItem(name: "cuisine", value: cuisine),
-                URLQueryItem(name: "excludeCuisine", value: excludeCuisine),
                 URLQueryItem(name: "diet", value: diet),
                 URLQueryItem(name: "intolerances", value: intolerances),
                 URLQueryItem(name: "equipment", value: equipment),

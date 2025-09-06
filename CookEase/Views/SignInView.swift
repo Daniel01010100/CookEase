@@ -29,6 +29,8 @@ struct SignInView: View {
                     .font(.title2)
                 Spacer()
                 TextField("Your email address ", text: self.$loginEmail)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
             }
             .frame(height: 40)
             
@@ -37,6 +39,8 @@ struct SignInView: View {
                     .font(.title2)
                 Spacer()
                 TextField("**********", text: self.$loginPassword)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
             }
             .frame(height: 40)
             

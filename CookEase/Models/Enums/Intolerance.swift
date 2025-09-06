@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Intolerance: String, Codable {
+enum Intolerance: String, Codable, CaseIterable {
     case none
     case dairy = "dairy"
     case egg = "egg"

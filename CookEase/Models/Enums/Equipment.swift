@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum CommonEquipment: String, Codable {
+enum CommonEquipment: String, Codable, CaseIterable {
     /* Heating */
     case fryingPan = "frying pan"
     case saucePan = "sauce pan"

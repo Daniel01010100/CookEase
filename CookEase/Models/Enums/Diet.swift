@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Diet: String, Codable {
+enum Diet: String, Codable, CaseIterable {
     case standard
     case glutenFree = "gluten free"
     case ketogenic = "ketogenic"

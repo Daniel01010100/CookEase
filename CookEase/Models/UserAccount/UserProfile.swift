@@ -37,7 +37,6 @@ struct UserProfile: Codable, Identifiable {
     var intolerances: [Intolerance]?    // An array that stores user's intolerance or food allergies (optional).
     var ownedEquipment: [Equipment]?    // An array that stores the equipment owned by the user(optional).
     var existingIngredients: [Ingredient]?  // An array that stores the ingredients the user has (optional).
-    var cuisinePreference: [Cuisine: PreferenceType] = [:]  // An dictionary that stores the user's cuisine preferences.
     var dishPreference: [UUID: DishPreference] = [:]    // An dictionary that stores the user's dish preferences.
     
     init() {

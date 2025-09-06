@@ -72,8 +72,17 @@ class UserViewModel {
         self.userProfile.nickname = nickName
     }
     
-    func setCookingSkill(_ skill: CookingSkill) {
-        self.userProfile.cookingSkill = skill
+    func setCookingSkill(_ skill: Int) {
+        switch skill {
+        case 0:
+            self.userProfile.cookingSkill = .Basic
+        case 1:
+            self.userProfile.cookingSkill = .Intermediate
+        case 2:
+            self.userProfile.cookingSkill = .Advanced
+        default:
+            self.userProfile.cookingSkill = .Basic
+        }
     }
     
     func getUserCookingSkill() -> CookingSkill {
@@ -216,14 +225,6 @@ class UserViewModel {
     
     func getUserExistingIngredients() -> [Ingredient] {
         return self.userProfile.existingIngredients ?? []
-    }
-    
-    func updateCuisinePreference(_ cuisine: Cuisine, preferenceType: PreferenceType) {
-        self.userProfile.cuisinePreference[cuisine] = preferenceType
-    }
-    
-    func getUserCuisinePreference() -> [Cuisine: PreferenceType] {
-        return self.userProfile.cuisinePreference
     }
     
     func updateDishPreference(_ dishID: UUID, preferenceType: PreferenceType? = nil, isCookedBefore: Bool? = nil) {

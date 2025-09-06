@@ -13,6 +13,7 @@ class CookEaseViewModel {
     var userVM: UserViewModel
     var cuisineAPI: CuisineAPIRepository = CuisineAPIRepository()
     var navPath: [AuthRoute] = []
+    var recommendRecipe: [Dish] = []
     
     let cookEaseThemeColour = Color(red: 1.0, green: 0.4, blue: 0.0)
     
@@ -35,60 +36,65 @@ class CookEaseViewModel {
         return instruction
     }
     
-    func generateRecipes(_ dishName: String, _ number: Int) async throws -> [Dish] {
-        var favouritesCuisine: String = ""
-        var dislikeCuisine: String = ""
-        var dietInfo: String = ""
-        var intoleranceInfo: String = ""
-        var equipmentInfo: String = ""
-        
-        var recipes: [Dish] = []
-        
-        var cuisines = userVM.getUserCuisinePreference()
-        for (key, value) in cuisines {
-            if (value == .favourite) {
-                favouritesCuisine += "\(key),"
-            } else if (value == .dislike) {
-                dislikeCuisine += "\(key),"
+    // Equals to fetchRecipes() + fetchRecipeInformation()
+    func generateRecipes(_ query: String, _ number: Int, _ isPersonalised: Bool = true) async {
+        let queryInfo = query.lowercased()
+        if (isPersonalised) {
+            var dietInfo: String = ""
+            var intoleranceInfo: String = ""
+            var equipmentInfo: String = ""
+                        
+            let diets = userVM.getUserDietaryPreferences()
+            for diet in diets {
+                if (diet == .standard) { continue }
+                dietInfo += "\(diet),"
+            }
+            if (dietInfo.suffix(1) == ",") {
+                dietInfo.removeLast()
+            }
+            
+            let intolerances = userVM.getUserIntolerances()
+            for intolerance in intolerances {
+                if (intolerance == .none) { continue }
+                intoleranceInfo += "\(intolerance),"
+            }
+            if (intoleranceInfo.suffix(1) == ",") {
+                intoleranceInfo.removeLast()
+            }
+            
+            let tools = userVM.getUserOwnedEquipment()
+            for equipment in tools {
+                if (equipment == .standard) { continue }
+                equipmentInfo += "\(equipment),"
+            }
+            if (equipmentInfo.suffix(1) == ",") {
+                equipmentInfo.removeLast()
+            }
+            
+            do {
+                self.recommendRecipe = try await cuisineAPI.fetchRecipes(queryInfo, dietInfo, intoleranceInfo, equipmentInfo, number)
+            } catch {
+                print("Failed to fetch recipes: \(error)")
+            }
+        } else {
+            do {
+                self.recommendRecipe = try await cuisineAPI.fetchRecipes(queryInfo, "", "", "", number)
+            } catch {
+                print("Failed to fetch recipes: \(error)")
             }
         }
-        if (favouritesCuisine.suffix(1) == ",") {
-            favouritesCuisine.removeLast()
-        }
-        if (dislikeCuisine.suffix(1) == ",") {
-            dislikeCuisine.removeLast()
-        }
         
-        var diets = userVM.getUserDietaryPreferences()
-        for diet in diets {
-            if (diet == .standard) { continue }
-            dietInfo += "\(diet),"
+        var updatedDishes: [Dish] = []
+        for dish in self.recommendRecipe {
+            do {
+                let updatedDish = try await self.cuisineAPI.fetchRecipeInformation(dish.id, false)
+                updatedDishes.append(updatedDish)
+            } catch {
+                print("Failed to fetch info for dish id \(dish.id): \(error)")
+                updatedDishes.append(dish)
+            }
         }
-        if (dietInfo.suffix(1) == ",") {
-            dietInfo.removeLast()
-        }
-        
-        var intolerances = userVM.getUserIntolerances()
-        for intolerance in intolerances {
-            if (intolerance == .none) { continue }
-            intoleranceInfo += "\(intolerance),"
-        }
-        if (intoleranceInfo.suffix(1) == ",") {
-            intoleranceInfo.removeLast()
-        }
-        
-        var tools = userVM.getUserOwnedEquipment()
-        for equipment in tools {
-            if (equipment == .standard) { continue }
-            equipmentInfo += "\(equipment),"
-        }
-        if (equipmentInfo.suffix(1) == ",") {
-            equipmentInfo.removeLast()
-        }
-        
-        recipes = try await cuisineAPI.fetchRecipes(dishName, favouritesCuisine, dislikeCuisine, dietInfo, intoleranceInfo,
-                                         equipmentInfo, number)
-        return recipes
+        self.recommendRecipe = updatedDishes
     }
     
     
