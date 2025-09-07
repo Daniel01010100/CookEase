@@ -48,37 +48,8 @@ struct CookView: View {
                 Text("Search")
             })
             
-            List(self.cevm.recommendRecipe, id: \.id) { recipe in
-                HStack {
-                    if let imageURLStr = recipe.image,
-                       let imageURL = URL(string: imageURLStr) {
-                        AsyncImage(url: imageURL) { img in
-                            img
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        } placeholder: {
-                            ProgressView()
-                        }
-                        .frame(width: 150, height: 150)
-                        .clipped()
-                        .cornerRadius(10)
-                        .padding(20)
-                    }
-                    
-                    VStack(alignment: .leading) {
-                        Text(recipe.title ?? "No title specified")
-                            .font(.headline)
-                        if let mins = recipe.readyInMinutes {
-                            Text("Ready in \(mins) mins")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        } else {
-                            Text("No ready time specified")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
+            List(self.cevm.recommendRecipe, id: \.dishID) { recipe in
+                RecipeListView(recipe: recipe, cevm: self.cevm)
             }
         }
     }

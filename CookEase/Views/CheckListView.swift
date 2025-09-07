@@ -11,7 +11,7 @@ struct CheckListView: View {
     @Bindable var cevm: CookEaseViewModel
     var body: some View {
         List(self.cevm.userVM.getUserExistingIngredients(), id: \.id) { ingredient in
-                Text(ingredient.name)
+                Text(ingredient.name ?? "")
         }
     }
     

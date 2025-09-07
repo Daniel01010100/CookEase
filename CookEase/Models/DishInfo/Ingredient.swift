@@ -8,10 +8,10 @@
 import Foundation
 
 struct Ingredient: Codable, Identifiable {
-    var ingredientID: UUID = UUID()   // Localised ingredient id.
+    var ingredientID: UUID = UUID()  // Localised ingredient id.
     /* fetchIngredientInformation */
-    var id: Int? = nil     // Refer to "id" in the json file.
-    var name: String    //Refer to "name" in the json file.
+    var id: Int = 0     // Refer to "id" in the json file.
+    var name: String? = nil    //Refer to "name" in the json file.
     var image: String? = nil   // Refer to "image" in the json file.
     var categoryPath: [String]? = nil   // Refer to "categoryPath" in the json file.
     var amount: Double? = nil     // Refer to "amount" in the json file.
@@ -34,9 +34,10 @@ struct Ingredient: Codable, Identifiable {
     }
 }
 
-struct AmountUnit: Codable {
-    var unit: String? = nil
-    var value: Double? = nil
+struct RequiredIngredients: Codable {
+    /* Ingredient by ID */
+    var amount: AmountInfo? = nil
+    var name: String? = nil     // Refer to "name" in the json file.
 }
 
 struct AmountInfo: Codable {
@@ -44,8 +45,7 @@ struct AmountInfo: Codable {
     var us: AmountUnit? = nil
 }
 
-struct RequiredIngredients: Codable {
-    /* Ingredient by ID */
-    var amount: AmountInfo? = nil
-    var name: String? = nil     // Refer to "name" in the json file.
+struct AmountUnit: Codable {
+    var unit: String? = nil
+    var value: Double? = nil
 }

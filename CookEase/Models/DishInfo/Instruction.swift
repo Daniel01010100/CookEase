@@ -7,19 +7,21 @@
 
 import Foundation
 
-struct CookingTime: Decodable {
-    var number: Int     // Refer to "steps - length - number" in the json file.
-    var unit: String    // Refer to "steps - length - unit" in the json file.
-}
 
-struct CookingStep: Decodable {
-    var equipment: [EquipmentInfo]?   // Refer to "steps - equipment" in the json file.
-    var ingredients: [Ingredient]? // Refer to "steps - ingredients" in the json file.
-    var length: CookingTime?    // Refer to "steps - length" in the json file.
-    var number: Int     // Refer to "steps - number" in the json file.
-    var step: String    // Refer to "steps - step" in the json file.
-}
-
-struct Instruction: Decodable {
+struct Instruction: Codable {
     var steps: [CookingStep] = []   // Refer to "steps" in the json file.
+}
+
+struct CookingStep: Codable, Identifiable {
+    var id: UUID = UUID()   // Used to conform Identifiable
+    var equipment: [EquipmentInfo]? = nil   // Refer to "steps - equipment" in the json file.
+    var ingredients: [Ingredient]? = nil // Refer to "steps - ingredients" in the json file.
+    var length: CookingTime? = nil    // Refer to "steps - length" in the json file.
+    var number: Int = 0    // Refer to "steps - number" in the json file.
+    var step: String? = nil    // Refer to "steps - step" in the json file.
+}
+
+struct CookingTime: Codable {
+    var number: Int = 0     // Refer to "steps - length - number" in the json file.
+    var unit: String? = nil    // Refer to "steps - length - unit" in the json file.
 }

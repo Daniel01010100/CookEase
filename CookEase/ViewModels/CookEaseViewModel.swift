@@ -14,6 +14,7 @@ class CookEaseViewModel {
     var cuisineAPI: CuisineAPIRepository = CuisineAPIRepository()
     var navPath: [AuthRoute] = []
     var recommendRecipe: [Dish] = []
+    var recipeInstruction: Instruction = Instruction()
     
     let cookEaseThemeColour = Color(red: 1.0, green: 0.4, blue: 0.0)
     
@@ -21,7 +22,7 @@ class CookEaseViewModel {
         var ingredientsInfo = ""
         var recipes: [Dish] = []
         for ingredient in ingredients {
-            ingredientsInfo += "\(ingredient.name),"
+            ingredientsInfo += "\(ingredient.name ?? ""),"
         }
         if (ingredientsInfo.suffix(1) == ",") {
             ingredientsInfo.removeLast()
@@ -30,10 +31,13 @@ class CookEaseViewModel {
         return recipes
     }
     
-    func fetchInstructionForRecipe(_ recipeAPIID: Int) async throws -> Instruction {
+    func fetchInstructionForRecipe(_ recipeAPIID: Int) async {
         let isBreakdown = userVM.getUserCookingSkill() == .Basic ? true : false
-        var instruction = try await cuisineAPI.fetchAnalysedRecipeInstructions(recipeAPIID, isBreakdown)
-        return instruction
+        do {
+            self.recipeInstruction = try await cuisineAPI.fetchAnalysedRecipeInstructions(recipeAPIID, isBreakdown)
+        } catch {
+            print("Error occurred: \(error)")
+        }
     }
     
     // Equals to fetchRecipes() + fetchRecipeInformation()
@@ -62,6 +66,7 @@ class CookEaseViewModel {
                 intoleranceInfo.removeLast()
             }
             
+            /*
             let tools = userVM.getUserOwnedEquipment()
             for equipment in tools {
                 if (equipment == .standard) { continue }
@@ -70,6 +75,7 @@ class CookEaseViewModel {
             if (equipmentInfo.suffix(1) == ",") {
                 equipmentInfo.removeLast()
             }
+             */
             
             do {
                 self.recommendRecipe = try await cuisineAPI.fetchRecipes(queryInfo, dietInfo, intoleranceInfo, equipmentInfo, number)
@@ -95,6 +101,63 @@ class CookEaseViewModel {
             }
         }
         self.recommendRecipe = updatedDishes
+        self.saveDishToLocalJSON()
+    }
+    
+    func saveDishToLocalJSON(_ fileName: String = "DishList.json") {
+        let encoder = JSONEncoder()
+
+        do {
+            let jsonData = try encoder.encode(self.recommendRecipe)
+            let url = getDocumentsDirectory().appendingPathComponent(fileName)
+            try jsonData.write(to: url)
+            print("Saved dish to list \(url)")
+        } catch {
+            print("Failed to save dish list: \(error)")
+        }
+    }
+    
+    func loadDishFromLocalJSON(_ fileName: String = "DishList.json") {
+        let url = getDocumentsDirectory().appendingPathComponent(fileName)
+        do {
+            let jsonData = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            let recipe = try decoder.decode([Dish].self, from: jsonData)
+            self.recommendRecipe = recipe
+        } catch {
+            print("Failed to load local dish")
+            self.recommendRecipe = []
+        }
+    }
+    
+    func saveInstructionToLocalJSON(_ fileName: String = "Instruction.json") {
+        let encoder = JSONEncoder()
+        
+        do {
+            let jsonData = try encoder.encode(self.recipeInstruction)
+            let url = getDocumentsDirectory().appendingPathComponent(fileName)
+            try jsonData.write(to: url)
+            print("Saved instruction to list \(url)")
+        } catch {
+            print("Failed to save instruction: \(error)")
+        }
+    }
+    
+    func loadInstructionToLocalJSON(_ fileName: String = "Instruction.json") {
+        let url = getDocumentsDirectory().appendingPathComponent(fileName)
+        do {
+            let jsonData = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            self.recipeInstruction = try decoder.decode(Instruction.self, from: jsonData)
+        } catch {
+            print("Failed to load local instruction")
+            self.recipeInstruction = Instruction()
+        }
+    }
+    
+    
+    func getDocumentsDirectory() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
     
     

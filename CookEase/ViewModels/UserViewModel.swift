@@ -10,7 +10,8 @@ import Foundation
 @Observable
 class UserViewModel {
     var userProfile: UserProfile = UserProfile()    // The default value of userProfile will be overwritten in the sign-up function.
-    
+    var dishPreference: DishPreferenceType = .none
+
     /*
      @Brief
         Provides registration functionality, saves the user's email account to userProfile.
@@ -112,7 +113,7 @@ class UserViewModel {
     }
     
     func getUserDietaryPreferences() -> [Diet] {
-        return self.userProfile.diets ?? [.standard]
+        return self.userProfile.diets ?? []
     }
     
     func addIntolerance(_ intolerance: Intolerance) {
@@ -138,10 +139,10 @@ class UserViewModel {
     }
     
     func getUserIntolerances() -> [Intolerance] {
-        return self.userProfile.intolerances ?? [.none]
+        return self.userProfile.intolerances ?? []
     }
     
-    func addOwnedquipment(_ equipment: Equipment) {
+    func addOwnedquipment(_ equipment: CommonEquipment) {
         guard var tools = self.userProfile.ownedEquipment else {
             self.userProfile.ownedEquipment = [equipment]
             return
@@ -152,7 +153,7 @@ class UserViewModel {
         }
     }
     
-    func deleteOwnedEquipment(_ equipment: Equipment) throws {
+    func deleteOwnedEquipment(_ equipment: CommonEquipment) throws {
         guard var tools = self.userProfile.ownedEquipment else {
             throw CookEaseError.emptyDataSource(errorInfo: "equipment")
         }
@@ -163,8 +164,8 @@ class UserViewModel {
         self.userProfile.ownedEquipment = tools
     }
     
-    func getUserOwnedEquipment() -> [Equipment] {
-        return self.userProfile.ownedEquipment ?? [.standard]
+    func getUserOwnedEquipment() -> [CommonEquipment] {
+        return self.userProfile.ownedEquipment ?? []
     }
     
     func insertIngredients(_ ingredientID: UUID, _ name: String, _ amount: Double, _ unit: String,
@@ -227,22 +228,20 @@ class UserViewModel {
         return self.userProfile.existingIngredients ?? []
     }
     
-    func updateDishPreference(_ dishID: UUID, preferenceType: PreferenceType? = nil, isCookedBefore: Bool? = nil) {
-        var currentPreference = self.userProfile.dishPreference[dishID] ?? DishPreference()
-        
-        if let prefernce = preferenceType {
-            currentPreference.preferenceType = prefernce
-        }
-        
-        if let isCooked = isCookedBefore {
-            currentPreference.isCookedBefore = isCooked
-        }
-        
-        self.userProfile.dishPreference[dishID] = currentPreference
+    func updateDishStatus(_ dishID: UUID, _ isCookedBefore: Bool = false) {
+        var currentStatus = self.userProfile.dishStatus[dishID] ?? DishStatus()
+        currentStatus.preferenceType = self.dishPreference
+        currentStatus.isCookedBefore = isCookedBefore
+        self.userProfile.dishStatus[dishID] = currentStatus
     }
     
-    func getUserDishPreference() -> [UUID: DishPreference] {
-        return self.userProfile.dishPreference
+    func getUserDishPreference(_ dishID: UUID) -> DishPreferenceType {
+        self.dishPreference =  self.userProfile.dishStatus[dishID]?.preferenceType ?? .none
+        return self.dishPreference
+    }
+    
+    func getUserDishCookedBefore(_ dishID: UUID) -> Bool {
+        return self.userProfile.dishStatus[dishID]?.isCookedBefore ?? false
     }
     
     func saveUserProfile() throws {

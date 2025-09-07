@@ -186,9 +186,51 @@ class CuisineAPIRepository: CuisineAPIRepositoryProtocol {
         for rawStep in rawSteps {
             var step = CookingStep()
             
-            step.number = rawStep["number"] as? Int
-            step
+            step.number = (rawStep["number"] as? Int) ?? 0
+            step.step = rawStep["step"] as? String
+            
+            if let rawEquipment = rawStep["equipment"] as? [[String: Any]] {
+                var equipmentList: [EquipmentInfo] = []
+                
+                for equipment in rawEquipment {
+                    var e = EquipmentInfo()
+                    e.id = (equipment["id"] as? Int) ?? 0
+                    e.image = (equipment["image"] as? String) ?? ""
+                    if let equipmentName = equipment["name"] as? String {
+                        if let enumName = CommonEquipment(rawValue: equipmentName) {
+                            e.name = .common(enumName)
+                        } else {
+                            e.name = .other(equipmentName)
+                        }
+                    } else {
+                        e.name = .other("unknown")
+                    }
+                    
+                    if let temp = equipment["temperature"] as? [String: Any] {
+                        var tempInfo = TemperatureInfo()
+                        tempInfo.number = temp["number"] as? Int
+                        tempInfo.unit = temp["unit"] as? String
+                        e.temperature = tempInfo
+                    }
+                    equipmentList.append(e)
+                }
+                step.equipment = equipmentList
+            }
+            
+            if let rawIngredients = rawStep["ingredients"] as? [[String: Any]] {
+                var ingredientsList: [Ingredient] = []
+                for ingredient in rawIngredients {
+                    var i = Ingredient()
+                    i.id = (ingredient["id"] as? Int) ?? 0
+                    i.image = ingredient["image"] as? String
+                    i.name = ingredient["name"] as? String
+                    ingredientsList.append(i)
+                }
+                step.ingredients = ingredientsList
+            }
+            steps.append(step)
         }
+        instructionResult.steps = steps
         return instructionResult
     }
     

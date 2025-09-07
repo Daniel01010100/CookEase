@@ -11,7 +11,7 @@ struct HomeView: View {
     @Bindable var cevm: CookEaseViewModel
     
     var body: some View {
-        Text("Hello, World!")
+        Text("Welcome to CookEase")
     }
     
 }

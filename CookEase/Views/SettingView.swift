@@ -9,11 +9,11 @@ import SwiftUI
 
 struct SettingView: View {
     @Bindable var cevm: CookEaseViewModel
-    @State private var _showSkillSheet = false
-    @State private var _showEquipmentSheet = false
-    @State private var _showDietSheet = false
-    @State private var _showDishSheet = false
-    @State private var _showIntoleranceSheet = false
+    @State private var activeSheet: ActiveSheet? = nil
+    enum ActiveSheet: Identifiable, Hashable {
+        case skill, tool, diet, dish, intolerance
+        var id: Self { self }
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -34,39 +34,39 @@ struct SettingView: View {
             
             List {
                 Button(action: {
-                    self._showSkillSheet.toggle()
+                    activeSheet = .skill
                 }, label: {
                     Text("Cooking skill setting")
                         .font(.title2)
                 })
                 .padding(10)
-                
+
                 Button(action: {
-                    self._showEquipmentSheet.toggle()
+                    activeSheet = .tool
                 }, label: {
                     Text("Equipment setting")
                         .font(.title2)
                 })
                 .padding(10)
-                
+
                 Button(action: {
-                    self._showDietSheet.toggle()
+                    activeSheet = .diet
                 }, label: {
                     Text("Diet setting")
                         .font(.title2)
                 })
                 .padding(10)
-                
+
                 Button(action: {
-                    self._showDishSheet.toggle()
+                    activeSheet = .dish
                 }, label: {
                     Text("Dish preference setting")
                         .font(.title2)
                 })
                 .padding(10)
-                
+
                 Button(action: {
-                    self._showIntoleranceSheet.toggle()
+                    activeSheet = .intolerance
                 }, label: {
                     Text("Intolerance setting")
                         .font(.title2)
@@ -76,40 +76,132 @@ struct SettingView: View {
             .listStyle(.plain)
             .padding(.top, -50)
         }
-        .sheet(isPresented: self.$_showSkillSheet) {
-            VStack(spacing: 24) {
-                Text("What's your cooking level?")
-                    .font(.title)
-                    .bold()
-                
-                // HStack of skill buttons. Hightlight selected and lower skill level icons.
-                HStack(spacing: 32) {
-                    ForEach(0..<3) { idx in
+        .sheet(item: $activeSheet) { item in
+            switch item {
+            case .skill:
+                VStack(spacing: 24) {
+                    Text("What's your cooking level?")
+                        .font(.title)
+                        .bold()
+
+                    // HStack of skill buttons. Hightlight selected and lower skill level icons.
+                    HStack(spacing: 32) {
+                        ForEach(0..<3) { idx in
+                            Button(action: {
+                                cevm.userVM.setCookingSkill(idx)
+                            }, label: {
+                                Image(systemName: "fork.knife.circle")
+                                    .resizable()
+                                    .frame(width: 40, height: 40)
+                                    .foregroundColor(idx <= cevm.userVM.getUserCookingSkill().rawValue ? self.cevm.cookEaseThemeColour : .secondary)
+                            })
+                        }
+                    }
+
+                    VStack(spacing: 8) {
+                        // Name for selected skill level.
+                        Text(getCookingSkillName(cevm.userVM.getUserCookingSkill().rawValue))
+                            .font(.headline)
+                        // Description for selected skill level.
+                        Text(getCookingSKillDescription(cevm.userVM.getUserCookingSkill().rawValue))
+                            .font(.subheadline)
+                            .padding(.horizontal)
+                    }
+                    Button(action: {
+                        activeSheet = nil
+                    }, label: {
+                        Text("Save")
+                    })
+                }
+            case .tool:
+                // Placeholder for EquipmentSheetView
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("What equipment do you have?")
+                        .font(.title)
+                        .bold()
+                    ForEach(CommonEquipment.allCases, id:\.self) { device in
                         Button(action: {
-                            cevm.userVM.setCookingSkill(idx)
+                            if (self.cevm.userVM.getUserOwnedEquipment().contains(device)) {
+                                do {
+                                    try self.cevm.userVM.deleteOwnedEquipment(device)
+                                } catch {
+                                    print("Error occurred while deleting equipment: \(error)")
+                                }
+                            } else {
+                                self.cevm.userVM.addOwnedquipment(device)
+                            }
                         }, label: {
-                            Image(systemName: "fork.knife.circle")
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                                .foregroundColor(idx <= cevm.userVM.getUserCookingSkill().rawValue ? self.cevm.cookEaseThemeColour : .secondary)
+                            Text(device.rawValue)
+                                .font(.caption)
+                                .foregroundColor(self.cevm.userVM.getUserOwnedEquipment().contains(device) ? .blue : .secondary)
                         })
                     }
+                    .padding(8)
+                    
+                    Button("Save") { activeSheet = nil }
                 }
-                
-                VStack(spacing: 8) {
-                    // Name for selected skill level.
-                    Text(getCookingSkillName(cevm.userVM.getUserCookingSkill().rawValue))
-                        .font(.headline)
-                    // Description for selected skill level.
-                    Text(getCookingSKillDescription(cevm.userVM.getUserCookingSkill().rawValue))
-                        .font(.subheadline)
-                        .padding(.horizontal)
+            case .diet:
+                // Placeholder for DietSheetView
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("What diet do you follow?")
+                        .font(.title)
+                        .bold()
+                    ForEach(Diet.allCases, id:\.self) { diet in
+                        Button(action: {
+                            if (self.cevm.userVM.getUserDietaryPreferences().contains(diet)) {
+                                do {
+                                    try cevm.userVM.deleteDietaryPreference(diet)
+                                } catch {
+                                    print("Error occurred while deleting diet: \(error)")
+                                }
+                            } else {
+                                self.cevm.userVM.addDietaryPreference(diet)
+                            }
+                        }, label: {
+                            Text(diet.rawValue)
+                                .font(.caption)
+                                .foregroundColor(self.cevm.userVM.getUserDietaryPreferences().contains(diet) ? .blue : .secondary)
+                        })
+                        .padding(8)
+                    }
+                    Button("Save") { activeSheet = nil }
                 }
-                Button(action: {
-                    self._showSkillSheet = false
-                }, label: {
-                    Text("Save")
-                })
+            case .dish:
+                // Placeholder for DishPreferenceSheetView
+                VStack(alignment: .center, spacing: 10) {
+                    Text("Dish Preference Sheet View")
+                        .font(.title)
+                        .bold()
+                    
+                    Button("Save") { activeSheet = nil }
+                }
+            case .intolerance:
+                // Placeholder for IntoleranceSheetView
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("What's your intolerances?")
+                        .font(.title)
+                        .bold()
+                    ForEach(Intolerance.allCases, id: \.self) { intolerance in
+                        Button(action: {
+                            if (self.cevm.userVM.getUserIntolerances().contains(intolerance)) {
+                                do {
+                                    try self.cevm.userVM.deleteIntolerance(intolerance)
+                                } catch {
+                                    print("Error occurred while deleting intolerance: \(error)")
+                                }
+                            } else {
+                                self.cevm.userVM.addIntolerance(intolerance)
+                            }
+                        }, label: {
+                            Text(intolerance.rawValue)
+                                .font(.caption)
+                                .foregroundColor(self.cevm.userVM.getUserIntolerances().contains(intolerance) ? .blue : .secondary)
+                        })
+                    }
+                    .padding(8)
+                    
+                    Button("Save") { activeSheet = nil }
+                }
             }
         }
     }
