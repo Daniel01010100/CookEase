@@ -87,6 +87,17 @@ struct SettingView: View {
                     }
                 })
                 .padding(10)
+                
+                Button(action: {
+                    self.cevm.userVM.signOut()
+                }, label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                        Text("Sign out")
+                            .font(.title3)
+                    }
+                })
+                .padding(10)
             }
             .listStyle(.plain)
             .padding(.top, -50)
