@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RecipeListView: View {
-    @State private var _showInstruction: Bool = false
+    @Binding var isJumpToInstruction: Bool
     let recipe: Dish
     let cevm: CookEaseViewModel
     
@@ -47,7 +47,7 @@ struct RecipeListView: View {
                     
                     Button(action: {
                         Task {
-                            self._showInstruction = true
+                            self.isJumpToInstruction = true
                             await self.cevm.fetchInstructionForRecipe(self.recipe.id)
                         }
                     }, label: {
@@ -87,9 +87,6 @@ struct RecipeListView: View {
                     }
                 }
             }
-        }
-        .navigationDestination(isPresented: self.$_showInstruction) {
-            CookingInstructionView(cevm: cevm)
         }
     }
 }

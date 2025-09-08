@@ -11,7 +11,7 @@ struct SettingView: View {
     @Bindable var cevm: CookEaseViewModel
     @State private var activeSheet: ActiveSheet? = nil
     enum ActiveSheet: Identifiable, Hashable {
-        case skill, tool, diet, dish, intolerance
+        case skill, tool, diet, intolerance, dish
         var id: Self { self }
     }
     
@@ -36,40 +36,55 @@ struct SettingView: View {
                 Button(action: {
                     activeSheet = .skill
                 }, label: {
-                    Text("Cooking skill setting")
-                        .font(.title2)
+                    HStack(spacing: 10) {
+                        Image(systemName: "fork.knife.circle")
+                        Text("Cooking skill setting")
+                            .font(.title3)
+                    }
                 })
                 .padding(10)
 
                 Button(action: {
                     activeSheet = .tool
                 }, label: {
-                    Text("Equipment setting")
-                        .font(.title2)
+                    HStack(spacing: 9) {
+                        Image(systemName: "oven")
+                        Text("Equipment setting")
+                            .font(.title3)
+                    }
                 })
                 .padding(10)
 
                 Button(action: {
                     activeSheet = .diet
                 }, label: {
-                    Text("Diet setting")
-                        .font(.title2)
-                })
-                .padding(10)
-
-                Button(action: {
-                    activeSheet = .dish
-                }, label: {
-                    Text("Dish preference setting")
-                        .font(.title2)
+                    HStack(spacing: 8) {
+                        Image(systemName: "carrot")
+                        Text("Diet setting")
+                            .font(.title3)
+                    }
                 })
                 .padding(10)
 
                 Button(action: {
                     activeSheet = .intolerance
                 }, label: {
-                    Text("Intolerance setting")
-                        .font(.title2)
+                    HStack(spacing: 5) {
+                        Image(systemName: "fish")
+                        Text("Intolerance setting")
+                            .font(.title3)
+                    }
+                })
+                .padding(10)
+                
+                Button(action: {
+                    activeSheet = .dish
+                }, label: {
+                    HStack(spacing: 16) {
+                        Image(systemName: "fork.knife")
+                        Text("Dish preference setting")
+                            .font(.title3)
+                    }
                 })
                 .padding(10)
             }
@@ -77,6 +92,7 @@ struct SettingView: View {
             .padding(.top, -50)
         }
         .sheet(item: $activeSheet) { item in
+            let columns = [GridItem(.flexible()), GridItem(.flexible())]
             switch item {
             case .skill:
                 VStack(spacing: 24) {
@@ -114,57 +130,79 @@ struct SettingView: View {
                     })
                 }
             case .tool:
-                // Placeholder for EquipmentSheetView
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("What equipment do you have?")
-                        .font(.title)
-                        .bold()
-                    ForEach(CommonEquipment.allCases, id:\.self) { device in
-                        Button(action: {
-                            if (self.cevm.userVM.getUserOwnedEquipment().contains(device)) {
-                                do {
-                                    try self.cevm.userVM.deleteOwnedEquipment(device)
-                                } catch {
-                                    print("Error occurred while deleting equipment: \(error)")
-                                }
-                            } else {
-                                self.cevm.userVM.addOwnedquipment(device)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("What equipment do you have?")
+                            .font(.title)
+                            .bold()
+                            .padding(.horizontal)
+
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(CommonEquipment.allCases, id: \.self) { device in
+                                Button(action: {
+                                    if (cevm.userVM.getUserOwnedEquipment().contains(device)) {
+                                        do {
+                                            try cevm.userVM.deleteOwnedEquipment(device)
+                                        } catch {
+                                            print("Error occurred while deleting equipment: \(error)")
+                                        }
+                                    } else {
+                                        cevm.userVM.addOwnedquipment(device)
+                                    }
+                                }, label: {
+                                    Text(device.rawValue)
+                                        .font(.body)
+                                        .foregroundColor(cevm.userVM.getUserOwnedEquipment().contains(device) ? .blue : .secondary)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.vertical, 6)
+                                })
                             }
-                        }, label: {
-                            Text(device.rawValue)
-                                .font(.caption)
-                                .foregroundColor(self.cevm.userVM.getUserOwnedEquipment().contains(device) ? .blue : .secondary)
-                        })
+                        }
+                        .padding(.horizontal)
+
+                        Button("Save") {
+                            activeSheet = nil
+                        }
+                        .padding()
                     }
-                    .padding(8)
-                    
-                    Button("Save") { activeSheet = nil }
                 }
             case .diet:
                 // Placeholder for DietSheetView
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("What diet do you follow?")
-                        .font(.title)
-                        .bold()
-                    ForEach(Diet.allCases, id:\.self) { diet in
-                        Button(action: {
-                            if (self.cevm.userVM.getUserDietaryPreferences().contains(diet)) {
-                                do {
-                                    try cevm.userVM.deleteDietaryPreference(diet)
-                                } catch {
-                                    print("Error occurred while deleting diet: \(error)")
-                                }
-                            } else {
-                                self.cevm.userVM.addDietaryPreference(diet)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("What diet do you follow?")
+                            .font(.title)
+                            .bold()
+                            .padding(.horizontal)
+
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(Diet.allCases, id: \.self) { diet in
+                                Button(action: {
+                                    if (cevm.userVM.getUserDietaryPreferences().contains(diet)) {
+                                        do {
+                                            try cevm.userVM.deleteDietaryPreference(diet)
+                                        } catch {
+                                            print("Error occurred while deleting diet: \(error)")
+                                        }
+                                    } else {
+                                        cevm.userVM.addDietaryPreference(diet)
+                                    }
+                                }, label: {
+                                    Text(diet.rawValue)
+                                        .font(.body)
+                                        .foregroundColor(cevm.userVM.getUserDietaryPreferences().contains(diet) ? .blue : .secondary)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.vertical, 6)
+                                })
                             }
-                        }, label: {
-                            Text(diet.rawValue)
-                                .font(.caption)
-                                .foregroundColor(self.cevm.userVM.getUserDietaryPreferences().contains(diet) ? .blue : .secondary)
-                        })
-                        .padding(8)
+                        }
+                        .padding(.horizontal)
+
+                        Button("Save") {
+                            activeSheet = nil
+                        }
+                        .padding()
                     }
-                    Button("Save") { activeSheet = nil }
                 }
             case .dish:
                 // Placeholder for DishPreferenceSheetView
@@ -177,30 +215,41 @@ struct SettingView: View {
                 }
             case .intolerance:
                 // Placeholder for IntoleranceSheetView
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("What's your intolerances?")
-                        .font(.title)
-                        .bold()
-                    ForEach(Intolerance.allCases, id: \.self) { intolerance in
-                        Button(action: {
-                            if (self.cevm.userVM.getUserIntolerances().contains(intolerance)) {
-                                do {
-                                    try self.cevm.userVM.deleteIntolerance(intolerance)
-                                } catch {
-                                    print("Error occurred while deleting intolerance: \(error)")
-                                }
-                            } else {
-                                self.cevm.userVM.addIntolerance(intolerance)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("What intolerance do you have?")
+                            .font(.title)
+                            .bold()
+                            .padding(.horizontal)
+
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(Intolerance.allCases, id: \.self) { intolerance in
+                                Button(action: {
+                                    if (cevm.userVM.getUserIntolerances().contains(intolerance)) {
+                                        do {
+                                            try cevm.userVM.deleteIntolerance(intolerance)
+                                        } catch {
+                                            print("Error occurred while deleting diet: \(error)")
+                                        }
+                                    } else {
+                                        cevm.userVM.addIntolerance(intolerance)
+                                    }
+                                }, label: {
+                                    Text(intolerance.rawValue)
+                                        .font(.body)
+                                        .foregroundColor(cevm.userVM.getUserIntolerances().contains(intolerance) ? .blue : .secondary)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.vertical, 6)
+                                })
                             }
-                        }, label: {
-                            Text(intolerance.rawValue)
-                                .font(.caption)
-                                .foregroundColor(self.cevm.userVM.getUserIntolerances().contains(intolerance) ? .blue : .secondary)
-                        })
+                        }
+                        .padding(.horizontal)
+
+                        Button("Save") {
+                            activeSheet = nil
+                        }
+                        .padding()
                     }
-                    .padding(8)
-                    
-                    Button("Save") { activeSheet = nil }
                 }
             }
         }

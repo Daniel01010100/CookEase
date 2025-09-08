@@ -56,6 +56,7 @@ class CookEaseViewModel {
             if (dietInfo.suffix(1) == ",") {
                 dietInfo.removeLast()
             }
+            print(dietInfo)
             
             let intolerances = userVM.getUserIntolerances()
             for intolerance in intolerances {
@@ -65,6 +66,7 @@ class CookEaseViewModel {
             if (intoleranceInfo.suffix(1) == ",") {
                 intoleranceInfo.removeLast()
             }
+            print(intoleranceInfo)
             
             /*
             let tools = userVM.getUserOwnedEquipment()

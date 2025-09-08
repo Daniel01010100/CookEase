@@ -10,8 +10,10 @@ import SwiftUI
 struct CheckListView: View {
     @Bindable var cevm: CookEaseViewModel
     var body: some View {
-        List(self.cevm.userVM.getUserExistingIngredients(), id: \.id) { ingredient in
+        VStack(alignment: .leading, spacing: 10) {
+            List(self.cevm.userVM.getUserExistingIngredients(), id: \.id) { ingredient in
                 Text(ingredient.name ?? "")
+            }
         }
     }
     

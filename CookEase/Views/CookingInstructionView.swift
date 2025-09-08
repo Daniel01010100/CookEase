@@ -28,12 +28,18 @@ struct CookingInstructionView: View {
                             Text("Ingredients needed: ")
                                 .font(.body)
                             ForEach(ingredients, id:\.ingredientID) { ingredient in
-                                Text("\(ingredient.name ?? "")")
-                                    .font(.body)
-                                Text("\(ingredient.amount ?? 0.0)")
-                                    .font(.body)
-                                Text("\(ingredient.unit ?? "")")
-                                    .font(.body)
+                                HStack {
+                                    Text(ingredient.name ?? "Unnamed ingredient")
+                                        .font(.body)
+                                    if let amount = ingredient.amount, amount > 0.0 {
+                                        Text(String(format: "%.1f", amount))
+                                            .font(.body)
+                                    }
+                                    if let unit = ingredient.unit, !unit.isEmpty {
+                                        Text(unit)
+                                            .font(.body)
+                                    }
+                                }
                             }
                         }
                     } else {
